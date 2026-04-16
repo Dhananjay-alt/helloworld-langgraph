@@ -1,26 +1,31 @@
 # Simple Bot
 
 from typing import TypedDict, List
+import os
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END
-from dotenv import load_dotenv # used to store secret stuff like API keys in a .env file
+from dotenv import load_dotenv  # used to store secret stuff like API keys in a .env file
 
 load_dotenv()
 
 class AgentState(TypedDict):
     messages: List[HumanMessage]
 
-llm = ChatOpenAI(model="gpt-4o")
+llm = ChatOpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url="https://openrouter.ai/api/v1",
+    model="openai/gpt-4o-mini",
+)
 
-def process(state: AgentState)-> AgentState:
+def process(state: AgentState) -> AgentState:
     response = llm.invoke(state["messages"])
     print(f"\nAI: {response.content}")
     return state
 
 graph = StateGraph(AgentState)
 graph.add_node("process", process)
-graph.add_edge(START,"process")
+graph.add_edge(START, "process")
 graph.add_edge("process", END)
 agent = graph.compile()
 
