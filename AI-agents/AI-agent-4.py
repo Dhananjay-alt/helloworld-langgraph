@@ -23,6 +23,7 @@ load_dotenv()
 
 # Global varible to store document content
 document_content =""
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
@@ -48,11 +49,13 @@ def save(filename: str)-> str:
     if not filename.endswith('.txt'):
         filename = f"{filename}.txt" 
 
+    output_path = os.path.join(BASE_DIR, filename)
+
     try: 
-        with open(filename, 'w') as file:
+        with open(output_path, 'w', encoding='utf-8') as file:
             file.write(document_content)
-        print(f"\n💾 Document has been saved to: {filename}")
-        return f"Document has been saved successfully to '{filename}'."
+        print(f"\n💾 Document has been saved to: {output_path}")
+        return f"Document has been saved successfully to '{output_path}'."
     
     except Exception as e: 
         return f"Error saving the document: {str(e)}"
